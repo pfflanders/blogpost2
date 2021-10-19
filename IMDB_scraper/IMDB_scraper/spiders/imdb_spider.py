@@ -11,8 +11,14 @@ class ImdbSpider(Spider):
     
     start_urls = ['https://www.imdb.com/title/tt9335498/']
 
+    def start_requests(self):
+        if self.url:
+            yield Request(self.url)
+        else:
+            yield Request(self.start_urls[0])
+    
     def parse(self, response):
-        yield Request('https://www.imdb.com/title/tt9335498/fullcredits', callback = self.parse_full_credits)
+        yield Request(urljoin(response.url, 'fullcredits'), callback = self.parse_full_credits)
         
 
     def parse_full_credits(self, response):

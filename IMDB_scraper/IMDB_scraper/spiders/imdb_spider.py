@@ -4,7 +4,6 @@
 from urllib.parse import urljoin
 from scrapy.spiders import Spider
 from scrapy.http import Request
-from scrapy.linkextractors import LinkExtractor
 
 class ImdbSpider(Spider):
     name = 'imdb_spider'
@@ -12,26 +11,35 @@ class ImdbSpider(Spider):
     start_urls = ['https://www.imdb.com/title/tt9335498/']
 
     def start_requests(self):
-        if self.url:
-            yield Request(self.url)
-        else:
-            yield Request(self.start_urls[0])
+        try: 
+            if self.url: # if a url is passed with the -a argument then we use that
+                yield Request(self.url)
+        except:
+            for url in self.start_urls:
+                yield Request(url)
     
     def parse(self, response):
-        yield Request(urljoin(response.url, 'fullcredits'), callback = self.parse_full_credits)
-        
+        yield Request(urljoin(response.url, 'fullcredits'), 
+                      callback = self.parse_full_credits)
+         
 
     def parse_full_credits(self, response):
-        rel_links = [a.attrib["href"] for a in response.css("td.primary_photo a")]
-        for link in rel_links:
-            yield Request(urljoin(response.url, link), callback = self.parse_actor_page)
+        # collect list of actor links
+        actor_links = [a.attrib["href"] for a in response.css("td.primary_photo a")]
 
+        # iterate over links and yielding requests to our next function
+        for link in actor_links:
+            yield Request(urljoin(response.url, link), 
+                          callback = self.parse_actor_page)
 
     def parse_actor_page(self, response):
+        # get actor name
         name = response.css('div.name-overview span::text').get()
         
+        # get list of movies
         movie_list = [item.css('a::text').get() for item in response.css('div.filmo-row')]
 
+        # yield dict with actor & movie 
         for movie in movie_list:
             yield {
                 "actor": name,

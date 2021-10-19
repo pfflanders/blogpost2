@@ -22,11 +22,6 @@ class ImdbSpider(Spider):
 
 
     def parse_actor_page(self, response):
-        # element.css("::attr(id)")
-        # element.css("div.filmo-row")
-        # element.css("a::text")
-        
-        
         name = response.css('div.name-overview span::text').get()
         
         movie_list = [item.css('a::text').get() for item in response.css('div.filmo-row')]
@@ -36,4 +31,3 @@ class ImdbSpider(Spider):
                 "actor": name,
                 "movie_or_TV_name": movie
             }
-

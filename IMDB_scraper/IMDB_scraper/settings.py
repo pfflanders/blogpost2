@@ -19,6 +19,7 @@ NEWSPIDER_MODULE = 'IMDB_scraper.spiders'
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = True
 
+# CLOSESPIDER_PAGECOUNT = 50
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 #CONCURRENT_REQUESTS = 32
 
